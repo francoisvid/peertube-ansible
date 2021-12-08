@@ -1,0 +1,7 @@
+---
+- hosts: peertube
+  roles:
+    - geerlingguy.nginx
+    - geerlingguy.nodejs
+    - peertube
+

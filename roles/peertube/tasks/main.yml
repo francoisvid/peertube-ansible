@@ -1,0 +1,91 @@
+---
+- name: Add the user peertube
+  user:
+    name: peertube
+    shell: /bin/bash
+
+- name: Install packages
+  apt:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+  with_items: "{{ peertube_packages }}"
+
+- name: set permissions
+  file:  
+    path: /var/www/peertube
+    state: directory
+    owner: peertube
+    group: peertube
+    mode: 0755
+
+- name: set permissions
+  file:  
+    path: /var/www/peertube/{{ item }}
+    state: directory
+    owner: peertube
+    group: peertube
+    recurse: yes
+    mode: 0755
+  with_items:
+    - config
+    - storage
+    - versions
+
+- name: install peertube
+  unarchive:
+    src: https://github.com/Chocobozzz/PeerTube/releases/download/v3.4.1/peertube-v3.4.1.zip
+    dest: /var/www/peertube/
+    owner: peertube
+    group: peertube
+    remote_src: yes
+
+- name: set permissions
+  file:
+    path: /var/www/peertube/peertube-v3.4.1
+    owner: peertube
+    group: peertube
+    recurse: yes
+    mode: 0755
+
+- name: set permissions
+  file:
+    src: /var/www/peertube/peertube-v3.4.1
+    dest: /var/www/peertube/peertube-latest
+    owner: peertube
+    group: peertube
+    state: link
+
+- name: Update npm packages
+  npm:
+    path: /var/www/peertube/peertube-latest
+    mode: 0644
+  become_user: peertube
+
+- name: Copy peertube configuration file
+  template:
+    src: peertube.cfg
+    dest: "/var/www/peertube/config/production.yaml"
+    owner: peertube
+    group: peertube
+    mode: 0644
+
+- name: Copy systemd unit file
+  template:
+    src: systemd.peertube
+    dest: /etc/systemd/system/peertube.service
+    owner: root
+    group: root
+    mode: 0644
+
+- name: enable and restart service
+  service:
+    name: peertube
+    daemon_reload: yes
+    enabled: yes
+    state: restarted
+
+- name: wait for peertube to be started
+  wait_for:
+    port: 9000
+    delay: 2

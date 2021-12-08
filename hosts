@@ -1,0 +1,4 @@
+[postgresql]
+db1.keyce.peertube ansible_host=10.42.42.32
+[peertube]
+web1.keyce.peertube ansible_host=10.42.42.12
