@@ -1,5 +1,0 @@
----
-
-- hosts: postgresql
-  roles: 
-    - geerlingguy.postgresql

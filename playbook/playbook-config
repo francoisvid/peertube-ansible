@@ -5,10 +5,10 @@
 
   tasks:
 
- # - name: configuration persistante du reseau
- #   template:
- #    src: files/network_int
- #    dest: /etc/network/interfaces.d/private
+  - name: configuration persistante du reseau
+    template:
+     src: ../files/network_int
+     dest: /etc/network/interfaces.d/private
 
   - name: Configuration du hostname
     hostname:
