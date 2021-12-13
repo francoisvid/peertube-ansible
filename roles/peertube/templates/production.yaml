@@ -6,7 +6,7 @@ listen:
 webserver:
   https: true
   hostname: '{{ peertube_domain }}'
-  port: 443
+  port: 80
 
 # Proxies to trust to get real client IP
 # If you run PeerTube just behind a local proxy (nginx), keep 'loopback'
