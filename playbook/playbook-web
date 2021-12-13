@@ -1,7 +1,152 @@
 ---
-- hosts: peertube
-  roles:
-    - geerlingguy.nginx
-    - geerlingguy.nodejs
-    - peertube
+- name: Deploiement de l'infrastructure web
+  hosts: peertube 
+  roles: 
+    - geerlingguy.nodejs 
+    - ocha.yarn
+  tasks:
+  - name: Installer les paquets 
+    package:
+      name: "{{ paquets }}"
+      state: latest
+    vars:
+      paquets:
+        - nginx
+        - git
+        - nfs-kernel-server
+        - nfs-common
+        - ffmpeg 
+        - openssl 
+        - g++ 
+        - make 
+        - redis-server 
+        - git
+        - unzip
+        
 
+  - name: Add the user peertube
+    user:
+      name: peertube
+      shell: /bin/bash
+      password: peertube
+
+
+  - name: set permissions 1
+    file:  
+      path: /var/www/peertube
+      state: directory
+      owner: peertube
+      group: peertube
+      mode: 0755
+
+  - name: set permissions 2
+    file:  
+      path: "/var/www/peertube/{{ item }}"
+      state: directory
+      owner: peertube
+      group: peertube
+      recurse: yes
+      mode: 0755
+    with_items:
+      - config
+      - storage
+      - versions
+  
+  #- name: download latest version of peertube
+  #  unarchive:
+  #    src: https://github.com/Chocobozzz/PeerTube/releases/download/v3.4.1/peertube-v3.4.1.zip
+  #    dest: /var/www/peertube/
+  #    owner: peertube
+  #    group: peertube
+  #    remote_src: yes 
+  #creates
+
+  - name: Configurer Nginx, Ajout d'un site
+    template:
+      src: ../files/site-nginx
+      dest: /etc/nginx/sites-available/peertube
+    notify:
+      - Recharger nginx
+
+  - name: Demarrer nginx
+    service:
+      name: nginx
+      state: started
+ 
+  - name: Desactiver le site par default
+    file:
+      path: /etc/nginx/sites-enabled/default
+      state: absent
+    notify:
+      - Recharger nginx 
+     
+
+  
+
+  - name: Activer le site nginx
+    file:
+      src: /etc/nginx/sites-available/peertube
+      dest: /etc/nginx/sites-enabled/peertube
+      state: link
+    notify: 
+      - Recharger nginx
+ 
+  
+
+  - name: set permissions 3
+    file:
+      path: /var/www/peertube/peertube-v3.4.1
+      owner: peertube
+      group: peertube
+      recurse: yes
+      mode: 0755
+
+  - name: set permissions 4
+    file:
+      src: /var/www/peertube/peertube-v3.4.1
+      dest: /var/www/peertube/peertube-latest
+      owner: peertube
+      group: peertube
+      state: link
+
+  - name: Copy peertube configuration file
+    template:
+      src: ../files/production.yaml
+      dest: /var/www/peertube/config/production.yaml
+      owner: peertube
+      group: peertube
+      mode: 0644
+
+  - name: COMMANDE
+    become_user: root
+    command: npm install --production --pure-lockfile
+    args:
+      chdir:  /var/www/peertube/peertube-latest
+    
+     
+
+  - name: Copy systemd unit file
+    template:
+      src: ../files/peertube.service
+      dest: /etc/systemd/system/
+      owner: root
+      group: root
+      mode: 0644  
+
+  - name: enable and restart service
+    service:
+      name: peertube
+      daemon_reload: yes
+      enabled: yes
+      state: restarted
+
+  - name: wait for peertube to be started
+    wait_for:
+      port: 9000
+      delay: 2
+    
+  handlers:
+    - name: Recharger nginx
+      service:
+        name: nginx
+        state: reloaded

@@ -37,8 +37,8 @@ postgresql_locales:
   - 'en_US.UTF-8'
 
 # Databases to ensure exist.
-postgresql_databases: []
-# - name: exampledb # required; the rest are optional
+postgresql_databases: 
+  - name: peertube_db # required; the rest are optional
 #   lc_collate: # defaults to 'en_US.UTF-8'
 #   lc_ctype: # defaults to 'en_US.UTF-8'
 #   encoding: # defaults to 'UTF-8'
@@ -52,13 +52,13 @@ postgresql_databases: []
 #   state: # defaults to 'present'
 
 # Users to ensure exist.
-postgresql_users: []
-# - name: jdoe #required; the rest are optional
+postgresql_users: 
+  - name: peertube #required; the rest are optional
 #   password: # defaults to not set
 #   encrypted: # defaults to not set
 #   priv: # defaults to not set
 #   role_attr_flags: # defaults to not set
-#   db: # defaults to not set
+    db: peertube_db
 #   login_host: # defaults to 'localhost'
 #   login_password: # defaults to not set
 #   login_user: # defaults to '{{ postgresql_user }}'

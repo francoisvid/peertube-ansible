@@ -21,7 +21,7 @@
 
 - name: set permissions
   file:  
-    path: /var/www/peertube/{{ item }}
+    path: "/var/www/peertube/{{ item }}"
     state: directory
     owner: peertube
     group: peertube
@@ -31,15 +31,15 @@
     - config
     - storage
     - versions
-
-- name: install peertube
+  
+- name: download latest version of peertube
   unarchive:
     src: https://github.com/Chocobozzz/PeerTube/releases/download/v3.4.1/peertube-v3.4.1.zip
     dest: /var/www/peertube/
     owner: peertube
     group: peertube
     remote_src: yes
-
+    
 - name: set permissions
   file:
     path: /var/www/peertube/peertube-v3.4.1
@@ -56,27 +56,21 @@
     group: peertube
     state: link
 
-- name: Update npm packages
-  npm:
-    path: /var/www/peertube/peertube-latest
-    mode: 0644
-  become_user: peertube
-
 - name: Copy peertube configuration file
   template:
-    src: peertube.cfg
-    dest: "/var/www/peertube/config/production.yaml"
+    src: ../../peertube/templates/production.yaml
+    dest: /var/www/peertube/config/production.yaml.example
     owner: peertube
     group: peertube
     mode: 0644
 
 - name: Copy systemd unit file
   template:
-    src: systemd.peertube
-    dest: /etc/systemd/system/peertube.service
+    src: ../../peertube/templates/peertube.service
+    dest: /etc/systemd/system/
     owner: root
     group: root
-    mode: 0644
+    mode: 0755
 
 - name: enable and restart service
   service:
