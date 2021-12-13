@@ -1,6 +1,6 @@
 ---
-
-- hosts: postgresql
+- name: Deploiement de la bdd
+  hosts: postgresql
   become: yes
   tasks:
 
@@ -23,11 +23,6 @@
       src: ../files/pg_hba.conf
       dest: /etc/postgresql/13/main/pg_hba.conf
     notify: Redemarrer postgresql 
- # - name: redemarrer postgresql
- #   service:
- #     name: postgresql
- #     state: restarted    
-
 
   - name: Creation de la base de donnée
     postgresql_db:
