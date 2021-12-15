@@ -1,29 +1,7 @@
-# Minimum Nginx version required:  1.13.0 (released Apr 25, 2017)
-# Please check your Nginx installation features the following modules via 'nginx -V':
-# STANDARD HTTP MODULES: Core, Proxy, Rewrite, Access, Gzip, Headers, HTTP/2, Log, Real IP, SSL, Thread Pool, Upstream, AIO Multithreading.
-# THIRD PARTY MODULES:   None.
-
-#server {
-#  listen 80;
-#  listen [::]:80;
-#  server_name {{ peertube_domain }};
-
-#  location /.well-known/acme-challenge/ {
-#    default_type "text/plain";
-#    root /var/www/certbot;
-#  }
-#  location / { return 301 https://$host$request_uri; }
-#}
-
-upstream backend {
-  server 127.0.0.1:9000;
-}
-
 server {
-  listen 80;
-  listen [::]:80;
-  server_name peertube.keyce;
-  
+  listen 12107;
+  listen [::]:12107;
+  server_name _;
 
   access_log /var/log/nginx/peertube.access.log; # reduce I/0 with buffer=10m flush=5m
   error_log  /var/log/nginx/peertube.error.log;
@@ -257,4 +235,8 @@ server {
 
     try_files $uri @api;
   }
+}
+
+upstream backend {
+  server 127.0.0.1:9000;
 }

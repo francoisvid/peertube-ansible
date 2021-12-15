@@ -1,9 +1,6 @@
 ---
 - name: Deploiement de l'infrastructure web
   hosts: web1
-#  roles: 
-#    - geerlingguy.nodejs 
-#    - ocha.yarn
   tasks:
   - name: Installer les paquets 
     package:
@@ -22,6 +19,7 @@
         - redis-server 
         - git
         - unzip
+        - certbot
         
   - name: Add the user peertube
     user:
@@ -57,26 +55,34 @@
       owner: peertube
       group: peertube
       remote_src: yes 
-  #creates
-
-  - name: Configurer Nginx, Ajout d'un site
-    template:
-      src: ../files/site-nginx
-      dest: /etc/nginx/sites-available/peertube
-    notify:
-      - Recharger nginx
 
   - name: Demarrer nginx
     service:
       name: nginx
       state: started
+
+  - name: Activation de peertube
+    become_user: root
+    command: systemctl enable peertube
+
+  - name: Demarrer peertube
+    service:
+      name: peertube
+      state: started
+
+  - name: Configurer Nginx, Ajout d'un site
+    template:
+      src: ../files/site-nginx
+      dest: /etc/nginx/sites-available/peertube
+    notify: 
+      - Recharger nginx
  
   - name: Desactiver le site par default
     file:
       path: /etc/nginx/sites-enabled/default
       state: absent
-    notify:
-      - Recharger nginx 
+    notify: 
+      - Recharger nginx
      
   - name: Activer le site nginx
     file:
@@ -110,18 +116,11 @@
       group: peertube
       mode: 0644
  
-  - name: COMMANDE 1 ?
+  - name: Installation des dépendances
     become_user: root
-    command: npm install npm@latest --production --pure-lockfile
+    command: yarn install --production --pure-lockfile
     args:
-      chdir: /var/www/peertube/peertube-latest 
-
-#  - name: COMMANDE 2 ?
-#    become_user: root
-#    command: npm install --production --pure-lockfile
-#    args:
-#      chdir: /var/www/peertube/peertube-latest
-    
+      chdir: /var/www/peertube/peertube-latest
     
   - name: Copy systemd unit file
     template:
@@ -129,7 +128,7 @@
       dest: /etc/systemd/system/
       owner: root
       group: root
-      mode: 0644  
+      mode: 0644
 
   - name: enable and restart service
     service:
@@ -138,13 +137,22 @@
       enabled: yes
       state: restarted
 
-#  - name: wait for peertube to be started
-#    wait_for:
-#      port: 9000
-#      delay: 2
-    
+  - name: wait for peertube to be started
+    wait_for:
+      port: 9000
+      delay: 2
+  
   handlers:
     - name: Recharger nginx
       service:
         name: nginx
         state: reloaded
+
+  handlers:
+    - name: Recharger peertube
+      service:
+        name: peertube
+        state: reloaded
+
+# root@peertube:~#systemctl daemon-reload
+# root@peertube:~#systemctl enable peertube

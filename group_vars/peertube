@@ -2,17 +2,17 @@
 
 
 peertube_packages:
-  - ffmpeg 
-  - openssl 
-  - g++ 
-  - make 
-  - redis-server 
+  - ffmpeg
+  - openssl
+  - g++
+  - make
+  - redis-server
   - git
   - unzip
 
 peertube_version: v3.4.1
-peertube_domain: peertube.example.com
-peertube_admin_email: peertube@example.com
+peertube_domain: peertube.keyce
+peertube_admin_email: peertube.keyce
 peertube_database_suffix: _prod
 peertube_database_username: peertube
 peertube_database_password: peertube
@@ -27,8 +27,8 @@ peertube_smtp_ca_file: null # Used for self signed certificates
 peertube_smtp_from_address: 'peertube@example.com'
 
 peertube_instance_name: PeerTube
-peertube_instance_short_description: 'PeerTube, a federated (ActivityPub) video streaming platform using P2P (BitTorrent) directly in the web browser with WebTorrent and Angular.'
-peertube_instance_description: ""
-peertube_instance_terms: ""
+peertube_instance_short_description: 'TOTO AU SKI'
+peertube_instance_description: ''
+peertube_instance_terms: ''
 peertube_services_twitter_username: '@Chocobozzz'
 peertube_services_twitter_whitelisted: false

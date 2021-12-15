@@ -1,0 +1,10 @@
+---
+- name: Deploiement de l'infrastructure web
+  hosts: web1
+  tasks:
+
+  - name: wait for peertube to be started
+    wait_for:
+      host: 172.16.33.130
+      port: 9000
+      delay: 2

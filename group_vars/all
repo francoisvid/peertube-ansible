@@ -1,7 +1,7 @@
 ---
-project_name: keyce peertube
-project_url: kwi.peertube
-db_name: peertube_db
+project_name: peertube
+project_url: peertube.keyce
+db_name: peertube_prod
 db_user: peertube
 db_password: peertube
 
@@ -15,9 +15,14 @@ peertube_packages:
   - unzip
 
 peertube_version: v3.4.1
-peertube_domain: web1.keyce.peertube
-peertube_admin_email: peertube@example.com
+peertube_domain: 172.16.33.130
+peertube_port: 12107
+peertube_admin_email: 172.16.33.130
+
 peertube_database_suffix: _prod
+peertube_database_hostname: 172.16.33.131
+peertube_database_port: 5432
+peertube_database_name: peertube
 peertube_database_username: peertube
 peertube_database_password: peertube
 
