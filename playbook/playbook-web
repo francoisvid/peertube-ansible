@@ -42,7 +42,7 @@
       owner: peertube
       group: peertube
       remote_src: yes
-    creates: /var/www/peertube/peertube-{{ peertube_version }}.zip
+    #creates: /var/www/peertube/peertube-{{ peertube_version }}.zip
 
   - name: Demarrer nginx
     service:
@@ -106,7 +106,7 @@
  
   - name: Installation des dépendances
     become_user: root
-    command: yarn install --production --pure-lockfile
+    command: yarn install --production --pure-lockfile --no-optional
     args:
       chdir: /var/www/peertube/peertube-latest
     

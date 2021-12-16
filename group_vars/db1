@@ -1,17 +1,10 @@
 ---
 
 peertube_packages:
-  - nginx
-  - git
-  - nfs-kernel-server
-  - nfs-common
-  - ffmpeg 
-  - openssl 
-  - g++ 
-  - make 
+  - postgresql
+  - postgresql-contrib
   - redis-server
-  - unzip
-  - certbot
+  - python3-psycopg2
 
 postgres_ext:
   - pg_trgm

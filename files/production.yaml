@@ -34,7 +34,7 @@ trust_proxy:
 
 # Your database name will be database.name OR "peertube"+database.suffix
 database:
-  hostname: 'localhost'
+  hostname: 172.16.33.131
   port: 5432
   ssl: false
   suffix: '_prod'
