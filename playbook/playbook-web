@@ -1,9 +1,8 @@
 ---
 - name: Deploiement de l'infrastructure web
   hosts: peertube 
-  roles: 
-    - geerlingguy.nodejs 
-    - ocha.yarn
+  #roles: 
+  #  - ocha.yarn
   tasks:
   - name: Installer les paquets 
     package:
@@ -22,7 +21,48 @@
         - redis-server 
         - git
         - unzip
+        - gnupg2
+        - apt-transport-https
         
+        
+  
+  - name: Add Nodesource apt key.
+    apt_key:
+      url: https://keyserver.ubuntu.com/pks/lookup?op=get&fingerprint=on&search=0x1655A0AB68576280
+      id: "68576280"
+      state: present
+
+  - name: Add NodeSource repositories for Node.js.
+    apt_repository:
+      repo: "{{ item }}"
+      state: present
+    with_items:
+      - "deb https://deb.nodesource.com/node_{{ nodejs_version }} {{ ansible_distribution_release }} main"
+      - "deb-src https://deb.nodesource.com/node_{{ nodejs_version }} {{ ansible_distribution_release }} main"
+    register: node_repo
+
+  - name: Install the nodejs
+    apt:
+      name: nodejs
+      state: present
+      
+
+  - name: Install Yarn apt key
+    apt_key:
+      url: https://dl.yarnpkg.com/debian/pubkey.gpg
+      state: present
+
+  - name: Add Yarn apt repo
+    apt_repository:
+      repo: deb https://dl.yarnpkg.com/debian/ stable main
+      state: present
+      filename: yarn
+
+  - name: Install Yarn
+    apt:
+      update_cache: yes
+      pkg: yarn
+      state: latest
 
   - name: Add the user peertube
     user:
@@ -77,9 +117,12 @@
     file:
       path: /etc/nginx/sites-enabled/default
       state: absent
-    notify:
-      - Recharger nginx 
-     
+    #notify:
+    #  - Recharger nginx 
+  - name: Recharger nginx
+    service:
+      name: nginx
+      state: reloaded   
 
   
 
@@ -88,9 +131,12 @@
       src: /etc/nginx/sites-available/peertube
       dest: /etc/nginx/sites-enabled/peertube
       state: link
-    notify: 
-      - Recharger nginx
- 
+   # notify: 
+   #   - Recharger nginx
+  - name: Recharger nginx
+    service:
+      name: nginx
+      state: reloaded  
   
 
   - name: set permissions 3
@@ -119,7 +165,7 @@
 
   - name: COMMANDE
     become_user: root
-    command: npm install --production --pure-lockfile
+    command: yarn install --production --pure-lockfile --no-optional
     args:
       chdir:  /var/www/peertube/peertube-latest
     
@@ -145,8 +191,8 @@
       port: 9000
       delay: 2
     
-  handlers:
-    - name: Recharger nginx
-      service:
-        name: nginx
-        state: reloaded
+  #handlers:
+  #  - name: Recharger nginx
+  #    service:
+  #      name: nginx
+  #      state: reloaded

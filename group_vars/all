@@ -4,4 +4,7 @@ project_url: kwi.peertube
 db_name: peertube_db
 db_user: peertube
 db_password: peertube
-
+postgres_ext:
+  - pg_trgm
+  - unaccent
+nodejs_version: "14.x"

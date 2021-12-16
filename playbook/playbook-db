@@ -46,6 +46,14 @@
       privs: all
       login_host: 127.0.0.1
 
+  - name: Configurationdes extensions de la BD
+    postgresql_ext:
+      db: "{{ db_name }}"
+      name: "{{ item }}"
+      login_host: 127.0.0.1
+    with_items: "{{ postgres_ext }}"
+    
+
   - name: configurer postgresql
     template:
       src: ../files/network_db
