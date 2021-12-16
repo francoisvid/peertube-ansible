@@ -1,7 +1,7 @@
 server {
-  listen 12107;
-  listen [::]:12107;
-  server_name _;
+  listen 80;
+  listen [::]:80;
+  server_name ${WEBSERVER_HOST};  
 
   access_log /var/log/nginx/peertube.access.log; # reduce I/0 with buffer=10m flush=5m
   error_log  /var/log/nginx/peertube.error.log;

@@ -1,11 +1,11 @@
 ---
 - name: Deploiement de la bdd
-  hosts: db1
+  hosts: web1
   become: yes
   tasks:
 
   - name: installation des paquets necessaires
-    package:
+    apt:
       name: "{{ paquets }}"
       state: latest
     vars:
@@ -24,35 +24,41 @@
       dest: /etc/postgresql/14/main/pg_hba.conf
     notify: Redemarrer postgresql 
 
-  # - name: Création d'un utilisateur
-  #   postgresql_user:
-  #     state: present
-  #     name: "{{ db_user }}"
-  #     login_host: 127.0.0.1
-  #     login_password: "{{ db_password }}"
+  - name: Création d'un utilisateur
+    postgresql_user:
+      state: present
+      name: "{{ peertube_database_username }}"
+      password: "{{ peertube_database_password }}"
+      login_host: 127.0.0.1
 
-  # - name: Creation de la base de donnée
-  #   postgresql_db:
-  #     state: present
-  #     name: "{{ db_name }}"
-  #     login_host: 127.0.0.1
-  #     login_password: "{{ db_password }}"
+  - name: Creation de la base de donnée
+    postgresql_db:
+      state: present
+      name: "{{ peertube_database_name }}"
+      login_host: 127.0.0.1
+      owner: "{{ peertube_database_username }}"
    
-  # - name: "Grant db user access to app db"
+  #  - name: "Grant db user access to app db"
   #   postgresql_privs:
   #     type: database
-  #     database: "{{ db_name }}"
-  #     roles: "{{ db_user }}"
+  #     database: "{{ peertube_database_name }}"
+  #     roles: "GRANTS"
   #     grant_option: no
   #     privs: all
   #     login_host: 127.0.0.1
-  #     login_password: "{{ db_password }}"
+  #   login_password: "{{ db_password }}"
+   
 
-  - name: configurer postgresql
-    template:
-      src: ../files/network_db
-      dest: /etc/postgresql/14/main/conf.d
-    notify: Redemarrer postgresql
+  # A VOIR POUR LES EXTENSIONS
+
+  # - name: "Grant db user access to app db"
+  #   postgresql_ext:
+
+  # - name: configurer postgresql
+  #   template:
+  #     src: ../files/network_db
+  #     dest: /etc/postgresql/14/main/conf.d
+  #   notify: Redemarrer postgresql
 
   handlers:
   - name: Redemarrer postgresql

@@ -1,4 +1,4 @@
 [db1]
 db1.keyce.peertube  ansible_host=172.16.33.131
-[web1]
+[peertube]
 web1.keyce.peertube ansible_host=172.16.33.130

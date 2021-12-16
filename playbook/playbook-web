@@ -1,25 +1,12 @@
 ---
 - name: Deploiement de l'infrastructure web
   hosts: web1
+  #vars_file: ../vars/toto.yml
   tasks:
   - name: Installer les paquets 
     package:
-      name: "{{ paquets }}"
+      name: "{{ peertube_packages }}"
       state: latest
-    vars:
-      paquets:
-        - nginx
-        - git
-        - nfs-kernel-server
-        - nfs-common
-        - ffmpeg 
-        - openssl 
-        - g++ 
-        - make 
-        - redis-server 
-        - git
-        - unzip
-        - certbot
         
   - name: Add the user peertube
     user:
@@ -50,11 +37,12 @@
   
   - name: download latest version of peertube
     unarchive:
-      src: https://github.com/Chocobozzz/PeerTube/releases/download/v3.4.1/peertube-v3.4.1.zip
+      src: "https://github.com/Chocobozzz/PeerTube/releases/download/{{ peertube_version }}/peertube-{{ peertube_version }}.zip"
       dest: /var/www/peertube/
       owner: peertube
       group: peertube
-      remote_src: yes 
+      remote_src: yes
+    creates: /var/www/peertube/peertube-{{ peertube_version }}.zip
 
   - name: Demarrer nginx
     service:
@@ -75,14 +63,14 @@
       src: ../files/site-nginx
       dest: /etc/nginx/sites-available/peertube
     notify: 
-      - Recharger nginx
+      - Recharger toto
  
   - name: Desactiver le site par default
     file:
       path: /etc/nginx/sites-enabled/default
       state: absent
     notify: 
-      - Recharger nginx
+      - Recharger toto
      
   - name: Activer le site nginx
     file:
@@ -90,11 +78,11 @@
       dest: /etc/nginx/sites-enabled/peertube
       state: link
     notify: 
-      - Recharger nginx
+      - Recharger toto
  
   - name: set permissions 3
     file:
-      path: /var/www/peertube/peertube-v3.4.1
+      path: /var/www/peertube/peertube-{{ peertube_version }}
       owner: peertube
       group: peertube
       recurse: yes
@@ -102,7 +90,7 @@
 
   - name: set permissions 4
     file:
-      src: /var/www/peertube/peertube-v3.4.1
+      src: /var/www/peertube/peertube-{{ peertube_version }}
       dest: /var/www/peertube/peertube-latest
       owner: peertube
       group: peertube
@@ -137,13 +125,13 @@
       enabled: yes
       state: restarted
 
-  - name: wait for peertube to be started
-    wait_for:
-      port: 9000
-      delay: 2
+  # - name: wait for peertube to be started
+  #   wait_for:
+  #     port: 9000
+  #     delay: 2
   
   handlers:
-    - name: Recharger nginx
+    - name: Recharger toto
       service:
         name: nginx
         state: reloaded
