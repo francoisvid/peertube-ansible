@@ -1,6 +1,6 @@
 ---
 - name: Deploiement de la bdd
-  hosts: postgresql
+  hosts: db1
   become: yes
   tasks:
 
@@ -13,47 +13,68 @@
       - postgresql
       - python3-psycopg2
 
-  - name: Demarrer le service
-    service: "name={{ item }} state=started enabled=yes"
-    with_items:
-      - postgresql
+  - name: Demarrer le service postgres
+    service: 
+      name: postgresql
+      state: started
 
   - name: gestion de la connexion peer
     template:
       src: ../files/pg_hba.conf
-      dest: /etc/postgresql/13/main/pg_hba.conf
-    notify: Redemarrer postgresql 
+      dest: /etc/postgresql/14/main/pg_hba.conf
+    register: hba_status
 
-  - name: Creation de la base de donnée
-    postgresql_db:
-      state: present
-      name: "{{ db_name }}"
-      login_host: 127.0.0.1
-   
+  - name: Change listen postgres network
+    lineinfile:
+      path: /etc/postgresql/14/main/postgresql.conf
+      line: listen_addresses = '*'
+    register: psqlconf
+
+  - name: Redemarrer le service postgres
+    service: 
+      name: postgresql
+      state: restarted
+    when: hba_status.changed or psqlconf.changed
 
   - name: Création d'un utilisateur
     postgresql_user:
       state: present
-      name: "{{ db_user }}"
+      name: "{{ peertube_database_username }}"
+      password: "{{ peertube_database_password }}"
       login_host: 127.0.0.1
-   
+
+  - name: Creation de la base de donnée
+    postgresql_db:
+      state: present
+      name: "{{ peertube_database_name }}"
+      login_host: 127.0.0.1
+      owner: "{{ peertube_database_username }}"
+  
   - name: "Grant db user access to app db"
     postgresql_privs:
       type: database
-      database: "{{ db_name }}"
-      roles: "{{ db_user }}"
+      database: "{{ peertube_database_name }}"
+      roles: "{{ peertube_database_username }}"
       grant_option: no
       privs: all
       login_host: 127.0.0.1
 
+  - name: Configurationdes extensions de la BD
+    postgresql_ext:
+      db: "{{ peertube_database_name }}"
+      name: "{{ item }}"
+      login_host: 127.0.0.1
+    with_items: "{{ postgres_ext }}"
+    
+
   - name: configurer postgresql
     template:
       src: ../files/network_db
-      dest: /etc/postgresql/13/main/conf.d
+      dest: /etc/postgresql/14/main/conf.d
     notify: Redemarrer postgresql
 
   handlers:
   - name: Redemarrer postgresql
     service:
      name: postgresql
-     state: restarted    
+     state: restarted  

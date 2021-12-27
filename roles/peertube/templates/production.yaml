@@ -1,12 +1,12 @@
 listen:
-  hostname: 'localhost'
+  hostname: '127.0.0.1'
   port: 9000
 
 # Correspond to your reverse proxy "listen" configuration
 webserver:
   https: true
   hostname: '{{ peertube_domain }}'
-  port: 80
+  port: '{{ peertube_port }}'
 
 # Proxies to trust to get real client IP
 # If you run PeerTube just behind a local proxy (nginx), keep 'loopback'
@@ -16,11 +16,14 @@ trust_proxy:
 
 # Your database name will be "peertube"+database.suffix
 database:
-  hostname: 'localhost'
-  port: 5432
+  hostname: '{{ peertube_database_hostname }}'
+  port: '{{ peertube_database_port }}'
+  ssl: false
   suffix: '{{ peertube_database_suffix }}'
   username: '{{ peertube_database_username }}'
   password: '{{ peertube_database_password }}'
+  pool:
+    max: 5
 
 # Redis server for short time storage
 redis:
@@ -39,15 +42,65 @@ smtp:
   ca_file: "{{ peertube_smtp_ca_file }}"
   from_address: "{{ peertube_smtp_from_address }}"
 
+email:
+  body:
+    signature: "PeerTube"
+  subject:
+    prefix: "[PeerTube]"
+
 # From the project root directory
 storage:
-  avatars: '/var/www/peertube/storage/avatars/'
-  videos: '/var/www/peertube/storage/videos/'
-  logs: '/var/www/peertube/storage/logs/'
-  previews: '/var/www/peertube/storage/previews/'
-  thumbnails: '/var/www/peertube/storage/thumbnails/'
-  torrents: '/var/www/peertube/storage/torrents/'
-  cache: '/var/www/peertube/storage/cache/'
+  tmp: 'storage/tmp/' # Use to download data (imports etc), store uploaded files before and during processing...
+  avatars: 'storage/avatars/'
+  videos: 'storage/videos/'
+  streaming_playlists: 'storage/streaming-playlists/'
+  redundancy: 'storage/redundancy/'
+  logs: 'storage/logs/'
+  previews: 'storage/previews/'
+  thumbnails: 'storage/thumbnails/'
+  torrents: 'storage/torrents/'
+  captions: 'storage/captions/'
+  cache: 'storage/cache/'
+  plugins: 'storage/plugins/'
+  # Overridable client files : logo.svg, favicon.png and icons/*.png (PWA) in client/dist/assets/images
+  # Could contain for example assets/images/favicon.png
+  # If the file exists, peertube will serve it
+  # If not, peertube will fallback to the default fil
+  client_overrides: 'storage/client-overrides/'
+
+object_storage:
+  enabled: false
+
+  # Without protocol, will default to HTTPS
+  endpoint: '' # 's3.amazonaws.com' or 's3.fr-par.scw.cloud' for example
+
+  region: 'us-east-1'
+
+  credentials:
+    # You can also use AWS_ACCESS_KEY_ID env variable
+    access_key_id: ''
+    # You can also use AWS_SECRET_ACCESS_KEY env variable
+    secret_access_key: ''
+
+  # Maximum amount to upload in one request to object storage
+  max_upload_part: 2GB
+
+  streaming_playlists:
+    bucket_name: 'streaming-playlists'
+
+    # Allows setting all buckets to the same value but with a different prefix
+    prefix: '' # Example: 'streaming-playlists:'
+
+    # Base url for object URL generation, scheme and host will be replaced by this URL
+    # Useful when you want to use a CDN/external proxy
+    base_url: '' # Example: 'https://mirror.example.com'
+
+  # Same settings but for webtorrent videos
+  videos:
+    bucket_name: 'videos'
+    prefix: ''
+    base_url: ''
+
 
 log:
   level: 'info' # debug/info/warning/error

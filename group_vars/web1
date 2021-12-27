@@ -1,23 +1,33 @@
 ---
-project_name: keyce peertube
-project_url: kwi.peertube
-db_name: peertube_db
-db_user: peertube
-db_password: peertube
 
 peertube_packages:
-  - ffmpeg
-  - openssl
-  - g++
-  - make
-  - redis-server
+  - nginx
   - git
+  - nfs-kernel-server
+  - nfs-common
+  - ffmpeg 
+  - openssl 
+  - g++ 
+  - make 
+  - redis-server
   - unzip
+  - certbot
+
+postgres_ext:
+  - pg_trgm
+  - unaccent
 
 peertube_version: v3.4.1
-peertube_domain: web1.keyce.peertube
-peertube_admin_email: peertube@example.com
+peertube_domain: localhost
+peertube_port: 12108
+peertube_admin_email: localhost
+
+postgre_user: postgres
+
 peertube_database_suffix: _prod
+peertube_database_hostname: localhost
+peertube_database_port: 5432
+peertube_database_name: peertube_prod
 peertube_database_username: peertube
 peertube_database_password: peertube
 
