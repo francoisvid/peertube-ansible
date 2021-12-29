@@ -1,7 +1,7 @@
 ---
 
   
-  - name: installation des paquets necessaires
+  - name: installation des paquets necessaire
     package:
       name: "{{ paquets }}"
       state: latest
