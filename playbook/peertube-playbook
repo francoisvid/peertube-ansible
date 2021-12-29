@@ -7,4 +7,4 @@
 - name: Deploiement de peertube
   hosts: peertube
   roles:
-   - peertube
+    - peertube
