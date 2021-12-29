@@ -1,7 +1,5 @@
 ---
-- name: Deploiement de la bdd
-  hosts: postgresql
-  tasks:
+
   
   - name: installation des paquets necessaires
     package:
@@ -71,9 +69,3 @@
       src: ../files/network_db
       dest: /etc/postgresql/13/main/conf.d
     notify: Redemarrer postgresql
-
-  handlers:
-  - name: Redemarrer postgresql
-    service:
-     name: postgresql
-     state: restarted  

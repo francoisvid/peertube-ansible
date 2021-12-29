@@ -1,0 +1,10 @@
+--- 
+
+- hosts: postgresql
+  roles:
+    - postgreSQL
+    
+- name: Deploiement de peertube
+  hosts: peertube
+  roles:
+   - peertube

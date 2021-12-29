@@ -1,0 +1,16 @@
+---
+
+peertube_username: peertube
+peertube_password: peertube
+
+postgre_user: postgres
+
+peertube_database_suffix: _prod
+peertube_database_hostname: localhost
+peertube_database_port: 5432
+peertube_database_name: peertube_prod
+
+
+postgres_ext:
+  - pg_trgm
+  - unaccent

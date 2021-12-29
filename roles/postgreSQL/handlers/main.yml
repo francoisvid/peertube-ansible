@@ -1,0 +1,6 @@
+---
+
+  - name: Redemarrer postgresql
+    service:
+      name: postgresql
+      state: restarted  
